@@ -13,17 +13,16 @@ main:
 
 	###CHARACTER###
 	
-	#set the syscall to read in a string
-	li $v0, 8
-	#set a point in the memory for the character
-	la $a0, char
-	#set a limit for the number of bytes to read in
-	li $a1, 1
+	#set the syscall to read in a character
+	li $v0, 12
 	#carry out the operation labled by $v0
 	syscall
 
-	#set the syscall to print out a string
-	li $v0, 4
+	sw $v0, char
+	lw $a0, char
+
+	#set the syscall to print out a char
+	li $v0, 11
 	#carry out the operation labled by $v0
 	syscall
 
@@ -47,14 +46,12 @@ main:
 
 	#set the syscall to read in an integer
 	li $v0, 5
-	#set a point in the memory for the integer
-	la $a0, integer
-	#set a limit for the number of bytes to read in
-	li $a1, 1
 	#carry out the operation labled by $v0
 	syscall
 
-	#set the syscall to print out a string
+	add $a0, $zero, $v0
+
+	#set the syscall to print out an integer
 	li $v0, 1
 	#carry out the operation labled by $v0
 	syscall
