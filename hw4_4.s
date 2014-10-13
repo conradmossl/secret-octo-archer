@@ -20,19 +20,36 @@ terminate: .asciiz "Calculator Terminated"
 	#the following will be be actual code
 	.text
 
-#function for addition
-Add:
-	add $s3, $s1, $s0
-	# jal Answer
-
-	add $a0, $zero, $s3
+Answer:
+	
+	addi $a0, $s3, 0
 
 	#set the syscall to print out an integer
 	li $v0, 1
 	#carry out the operation labled by $v0
 	syscall
 
-	jr $ra
+
+	#set the syscall to print out a string
+	li $v0, 4
+	#set a point in the memory for the string
+	la $a0, calculation
+	#carry out the operation labled by $v0
+	syscall
+
+	#set the syscall to read in a character
+	li $v0, 12
+	#carry out the operation labled by $v0
+	syscall
+
+	beq $v0, 'n', End
+
+	jal Loop
+
+#function for addition
+Add:
+	add $s3, $s1, $s0
+	jal Answer
 
 #function for multiplication
 #a0 X a1 = 
@@ -57,16 +74,6 @@ Add:
 #function for division
 
 ###
-# Answer:
-	
-# 	add $a0, $zero, $s3
-
-# 	#set the syscall to print out an integer
-# 	li $v0, 1
-# 	#carry out the operation labled by $v0
-# 	syscall
-
-# 	jr $ra
 
 #the following will be the main program
 main:
@@ -90,6 +97,9 @@ main:
 	#carry out the operation labled by $v0
 	syscall
 
+	jal Loop
+
+Loop:
 	#set the syscall to print out a string
 	li $v0, 4
 	#set a point in the memory for the string
@@ -139,21 +149,20 @@ main:
 
 	beq $s2, '+', Add
 
-	# jal End
+	jal End
 
-	#loop until the user sends "n"
-# End:
-# 	#ending section
+End:
+	#ending section
 
-# 	#set a point in the memory for the string
-# 	la $a0, terminate
-# 	#carry out the operation labled by $v0
-# 	syscall
+	#set a point in the memory for the string
+	la $a0, terminate
+	#carry out the operation labled by $v0
+	syscall
 
-# 	#set the syscall to print out a string
-# 	li $v0, 4
-# 	#carry out the operation labled by $v0
-# 	syscall
+	#set the syscall to print out a string
+	li $v0, 4
+	#carry out the operation labled by $v0
+	syscall
 
-# 	#return
-# 	jr $ra
+	#return
+	jr $ra
