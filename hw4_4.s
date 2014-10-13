@@ -11,85 +11,79 @@ oper: .space 4
 
 #the following variables will by set to the following data
 heading: .asciiz "Welcome to SPIM Calculator 1.0!"
-first: .asciiz "\nEnter the first number "
-second: .asciiz "\nEnter the second number "
-operation: .asciiz "\nEnter the operation (+,-,*,/), the press enter key: ="
-calculation: .asciiz "Another Calculation"
-terminate: .asciiz "Calculator Terminated"
+first: .asciiz "\nEnter the first number \n==> "
+second: .asciiz "\nEnter the second number ==> "
+operation: .asciiz "\nEnter the operation (+,-,*,/) ==> "
+calculation: .asciiz "\nAnother Calculation? (y,n) ==> "
+terminate: .asciiz "\nCalculator Terminated"
 
 	#the following will be be actual code
 	.text
 
 Answer:
 	
-	addi $a0, $s3, 0
+	addi $a0, $s3, $zero
 
-	#set the syscall to print out an integer
+	#Print the answer
 	li $v0, 1
-	#carry out the operation labled by $v0
+	la $a0, $s3
 	syscall
-
 
 	#set the syscall to print out a string
 	li $v0, 4
 	#set a point in the memory for the string
 	la $a0, calculation
-	#carry out the operation labled by $v0
 	syscall
 
 	#set the syscall to read in a character
 	li $v0, 12
-	#carry out the operation labled by $v0
 	syscall
 
 	beq $v0, 'n', End
 
 	jal Loop
 
-#function for addition
+#subroutine for addition
 Add:
-	add $s3, $s1, $s0
+	add $s3, $s0, $s1
+	jal Answer
+	
+#subroutine for subtraction
+Subtract:
+	sub $s3, $s0, $s1
 	jal Answer
 
-#function for multiplication
-#a0 X a1 = 
+#subroutine for multiplication
+#s3 = s0 X s1
+Multiply: 
+	multu $s0, $s1
+	sw $LO, $s3
+	ja Answer
 
-# Multiply: 
-# 	# a counter to keep track of how many times we've iterated
-# 	# through the loop
-# 	add $s0, $zero, $zero
-# 	# a variable to store the result of the operation
-# 	add $s1, $zero, $zero	
-# 	ja Loop
-# Return:
-# 	# store result on stack
-# 	# adjust stack pointer accordingly
-
-# Loop:
-# 	add $s0, $s0, $a0
-# 	addi $s0, 1
-# 	beq $s0, $s1, Return
-# 	ja Loop
-
-#function for division
-
-###
-
+#subroutine for division
+#s3 = s0 / s1 
+#s4 = s0 % s1
+Divide:
+	div $s0, $s1
+	sw $LO, $s3
+	sw $HI, $s4 	
+	#print the Remainder
+	li $v0, 4
+	la $a0, "\nRemainder ==> "
+	syscall
+	li $v0, 1
+	la $a0, $s3
+	syscall
+	
+	li $v0, 4
+	la $a0, "\nQuotient ==> "
+	syscall
+	ja Answer
+	
 #the following will be the main program
 main:
 	
 	#title section
-		#will happen regardless of first equation
-	
-	#make room for 2 integers and a character on the stack
-	addi $sp, $sp, -16
-	
-	#load variables to these allotments
-	sw $s0, 12($sp)
-	sw $s1, 8($sp)
-	sw $s2, 4($sp)
-	sw $s3, 0($sp) 
-
 	#set the syscall to print out a string
 	li $v0, 4
 	#set a point in the memory for the string
@@ -99,70 +93,65 @@ main:
 
 	jal Loop
 
+	#make room for 2 integers, a character, the result 
+	# and the remainder (if division)
+	addi $sp, $sp, -20
+	#load variables to these allotments
+	sw $s0, 16($sp)
+	sw $s1, 12($sp)
+	sw $s2, 8($sp)
+	sw $s3, 4($sp) 
+	sw $s4, 0($sp)
 Loop:
-	#set the syscall to print out a string
+	
+	#Prompt user for first input int
 	li $v0, 4
-	#set a point in the memory for the string
 	la $a0, first
-	#carry out the operation labled by $v0
 	syscall
-
 	#set the syscall to read in an integer
 	li $v0, 5
-	#carry out the operation labled by $v0
 	syscall
+	#store the first input integer into $s0
+	add $s0, $v0, $zero
 
-	#store the first input integer into $t0
-	add $s0, $zero, $v0
-
-	#set the syscall to print out a string
+	#prompt user for second input int
 	li $v0, 4
-	#set a point in the memory for the string
 	la $a0, second
-	#carry out the operation labled by $v0
 	syscall
-
 	#set the syscall to read in an integer
 	li $v0, 5
-	#carry out the operation labled by $v0
 	syscall
-
-	#store the second input integer into $t1
+	#store the second input integer into $s1
 	add $s1, $zero, $v0
 
-	#set the syscall to print out a string
+	#prompt the user for the operator
 	li $v0, 4
-	#set a point in the memory for the string
 	la $a0, operation
-	#carry out the operation labled by $v0
 	syscall
-
-	#set the syscall to read in a character
 	li $v0, 12
-	#carry out the operation labled by $v0
 	syscall
-
 	#take the data from $v0 and store it in the space allocated for oper
 	sw $v0, oper
-	#take the data from oper and store it in $t3
+	#take the data from oper and store it in $s2
 	lw $s2, oper
 
 	beq $s2, '+', Add
-
+	beq $s2, '-', Subtract
+	beq $s2, '*', Multiply
+#	beq $s2, '/', Divide
 	jal End
 
 End:
-	#ending section
+	#restore the registers
+	addi $sp, $sp, 20
+	lw $s4, 0($sp)
+	lw $s3, 4($sp) 
+	lw $s2, 8($sp)
+	lw $s1, 12($sp)
+	lw $s0, 16($sp)
 
-	#set a point in the memory for the string
-	la $a0, terminate
-	#carry out the operation labled by $v0
-	syscall
-
-	#set the syscall to print out a string
 	li $v0, 4
-	#carry out the operation labled by $v0
+	la $a0, terminate
 	syscall
 
-	#return
 	jr $ra
