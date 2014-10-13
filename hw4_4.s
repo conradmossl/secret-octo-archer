@@ -56,17 +56,22 @@ Subtract:
 #subroutine for multiplication
 #s3 = s0 X s1
 Multiply: 
-	multu $s0, $s1
-	sw $LO, $s3
-	ja Answer
+	# a counter to keep track of how many iterations we've made
+	# through the loop
+	add $t0, $zero, $zero
+	add	$s3, $zero, $zero
+Loop_mult:
+	beq $t0, $s1, Answer
+	add $s3, $s0, $zero
+	addi $t0, $t0, 1
+	ja Loop_mult
 
 #subroutine for division
 #s3 = s0 / s1 
 #s4 = s0 % s1
 Divide:
-	div $s0, $s1
-	sw $LO, $s3
-	sw $HI, $s4 	
+	
+	
 	#print the Remainder
 	li $v0, 4
 	la $a0, "\nRemainder ==> "
