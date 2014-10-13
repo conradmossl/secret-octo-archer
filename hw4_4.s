@@ -44,7 +44,7 @@ main:
 	
 	#title section
 		#will happen regardless of first equation
-
+	
 	#set a point in the memory for the string
 	la $a0, heading
 	#carry out the operation labled by $v0
