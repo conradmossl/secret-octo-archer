@@ -10,15 +10,31 @@
 oper: .space 4
 
 #the following variables will by set to the following data
-heading: .asciiz "Welcome to SPIM Calculator 1.0!"
+heading: .asciiz "Welcome to SPIM Calculator 1.0!\n"
 first: .asciiz "\nEnter the first number "
 second: .asciiz "\nEnter the second number "
 operation: .asciiz "\nEnter the operation (+,-,*,/), the press enter key: ="
-calculation: .asciiz "Another Calculation"
-terminate: .asciiz "Calculator Terminated"
+calculation: .asciiz "Another Calculation [y, n]?\n \n"
+terminate: .asciiz "\nCalculator Terminated"
 
 	#the following will be be actual code
 	.text
+
+End:
+	#ending section
+
+	#set a point in the memory for the string
+	la $a0, terminate
+	#carry out the operation labled by $v0
+	syscall
+
+	#set the syscall to print out a string
+	li $v0, 4
+	#carry out the operation labled by $v0
+	syscall
+
+	#return
+	jr $ra
 
 Answer:
 	
@@ -28,8 +44,6 @@ Answer:
 	li $v0, 1
 	#carry out the operation labled by $v0
 	syscall
-
-
 	#set the syscall to print out a string
 	li $v0, 4
 	#set a point in the memory for the string
@@ -50,54 +64,6 @@ Answer:
 Add:
 	add $s3, $s1, $s0
 	jal Answer
-
-#function for multiplication
-#a0 X a1 = 
-
-# Multiply: 
-# 	# a counter to keep track of how many times we've iterated
-# 	# through the loop
-# 	add $s0, $zero, $zero
-# 	# a variable to store the result of the operation
-# 	add $s1, $zero, $zero	
-# 	ja Loop
-# Return:
-# 	# store result on stack
-# 	# adjust stack pointer accordingly
-
-# Loop:
-# 	add $s0, $s0, $a0
-# 	addi $s0, 1
-# 	beq $s0, $s1, Return
-# 	ja Loop
-
-#function for division
-
-###
-
-#the following will be the main program
-main:
-	
-	#title section
-		#will happen regardless of first equation
-	
-	#make room for 2 integers and a character on the stack
-	addi $sp, $sp, -16
-	
-	#load variables to these allotments
-	sw $s0, 12($sp)
-	sw $s1, 8($sp)
-	sw $s2, 4($sp)
-	sw $s3, 0($sp) 
-
-	#set the syscall to print out a string
-	li $v0, 4
-	#set a point in the memory for the string
-	la $a0, heading
-	#carry out the operation labled by $v0
-	syscall
-
-	jal Loop
 
 Loop:
 	#set the syscall to print out a string
@@ -151,18 +117,50 @@ Loop:
 
 	jal End
 
-End:
-	#ending section
+#function for multiplication
+#a0 X a1 = 
 
-	#set a point in the memory for the string
-	la $a0, terminate
-	#carry out the operation labled by $v0
-	syscall
+# Multiply: 
+# 	# a counter to keep track of how many times we've iterated
+# 	# through the loop
+# 	add $s0, $zero, $zero
+# 	# a variable to store the result of the operation
+# 	add $s1, $zero, $zero	
+# 	ja Loop
+# Return:
+# 	# store result on stack
+# 	# adjust stack pointer accordingly
+
+# Loop:
+# 	add $s0, $s0, $a0
+# 	addi $s0, 1
+# 	beq $s0, $s1, Return
+# 	ja Loop
+
+#function for division
+
+###
+
+#the following will be the main program
+main:
+	
+	#title section
+		#will happen regardless of first equation
+	
+	#make room for 2 integers and a character on the stack
+	addi $sp, $sp, -16
+	
+	#load variables to these allotments
+	sw $s0, 12($sp)
+	sw $s1, 8($sp)
+	sw $s2, 4($sp)
+	sw $s3, 0($sp) 
 
 	#set the syscall to print out a string
 	li $v0, 4
+	#set a point in the memory for the string
+	la $a0, heading
 	#carry out the operation labled by $v0
 	syscall
 
-	#return
-	jr $ra
+	jal Loop
