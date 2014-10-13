@@ -11,7 +11,7 @@ answer2: .asciiz "; the sum="
 	.text
 
 #the following will be the main program
-main:	
+main:
 	#set the syscall to read in an integer
 	li $v0, 5
 	#carry out the operation labled by $v0
@@ -40,15 +40,16 @@ main:
 	add $t2, $zero, $zero
 
 Loop:
-	#if the loop has gone through the addition process N
-	#amount of times, end the loop
+	#end the loop if the loop has gone through
+	#the addition process N times
 	beq $t0, $t2, End
 	#otherwise, increase the counter by 1
 	addi $t2, $t2, 1
-	#and add the counter to the sum
+	#add the counter to the sum
 	add $t1, $t2, $t1
-	#repeat
+	#continue
 	j Loop
+
 End:
 
 	#set the syscall to print out a string

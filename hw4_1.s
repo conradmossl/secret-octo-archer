@@ -5,7 +5,7 @@
 char: .space 1
 string: .space 20
 integer: .space 1
-	#the following will be be actual code
+	#the following will be actual code
 	.text
 
 #the following will be the main program
@@ -26,7 +26,7 @@ main:
 	#carry out the operation labled by $v0
 	syscall
 
-	###STRING###
+	###  STRING  ###
 
 	#set the syscall to read in a string
 	li $v0, 8
