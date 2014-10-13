@@ -15,6 +15,10 @@ terminate: .asciiz "Calculator Terminated"
 	#the following will be be actual code
 	.text
 
+#function for addition
+Add:
+	
+
 #function for multiplication
 #a0 X a1 = 
 
@@ -44,6 +48,12 @@ main:
 	
 	#title section
 		#will happen regardless of first equation
+	
+	addi $sp, $sp, -12
+	
+	sw $s0, 8($sp)
+	sw $s1, 4($sp)
+	sw $s2, 0($sp)
 
 	#set a point in the memory for the string
 	la $a0, heading
@@ -61,7 +71,7 @@ main:
 	syscall
 
 	#store the second input integer into $t0
-	add $t0, $zero, $v0
+	add $s0, $zero, $v0
 
 	#set the syscall to read in an integer
 	li $v0, 5
@@ -69,7 +79,7 @@ main:
 	syscall
 
 	#store the first input integer into $t1
-	add $t1, $zero, $v0
+	add $s1, $zero, $v0
 
 	#set the syscall to read in a character
 	li $v0, 12
@@ -79,9 +89,12 @@ main:
 	#take the data from $v0 and store it in the space allocated for oper
 	sw $v0, oper
 	#take the data from oper and store it in $t3
-	lw $t2, oper
+	lw $s2, oper
 
-	lui 
+	lui $t0, '+'
+
+	beq $s2, $t0, Add
+
 
 	#loop until the user sends "n"
 Loop:
