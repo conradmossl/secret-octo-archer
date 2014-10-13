@@ -54,7 +54,6 @@ main:
 	sw $s0, 8($sp)
 	sw $s1, 4($sp)
 	sw $s2, 0($sp)
-
 	#set a point in the memory for the string
 	la $a0, heading
 	#carry out the operation labled by $v0
