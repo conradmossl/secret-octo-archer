@@ -10,10 +10,12 @@
 oper: .space 4
 
 #the following variables will by set to the following data
-heading: .asciiz "Welcome to SPIM Calculator 1.0!\n\n"
-first: .asciiz "Enter the first number "
+heading: .asciiz "Welcome to SPIM Calculator 1.0!\n"
+first: .asciiz "\nEnter the first number "
 second: .asciiz "Enter the second number "
 operation: .asciiz "Enter the operation (+,-,*,/), then press enter key: = "
+remain: .asciiz "\nRemainder ==> " 
+quoti: .asciiz "\nQuotient ==> "
 calculation: .asciiz "\n \nAnother Calculation [y, n]?\n \n"
 terminate: .asciiz "\nCalculator Terminated"
 
@@ -71,20 +73,32 @@ Loop_mult:
 #s4 = s0 % s1
 
 Divide:
-	
-	
+	# a counter to keep track of how many iterations we've made
+	# through the loop
+	add $s4, $zero, $zero
+	add	$s3, $zero, $zero
+	jal Loop_div
+Print_div:
+
 	#print the Remainder
-	# li $v0, 4
-	# la $a0, "\nRemainder ==> "
-	# syscall
+	li $v0, 4
+	la $a0, remain
+	syscall
 	li $v0, 1
-	add $a0, $s3, $zero
+	add $a0, $s0, $zero
 	syscall
 	
-	# li $v0, 4
-	# la $a0, "\nQuotient ==> "
-	# syscall
+	li $v0, 4
+	la $a0, quoti
+	syscall
 	jal Answer
+
+Loop_div:
+	slt $t0, $s0, $s1
+	bne $t0, $zero, Print_div
+	sub $s0, $s0, $s1
+	addi $s3, $s3, 1
+	jal Loop_div
 	
 #the following will be the main program
 main:
@@ -103,11 +117,11 @@ main:
 	# and the remainder (if division)
 	addi $sp, $sp, -20
 	#load variables to these allotments
-	sw $s0, 16($sp)
-	sw $s1, 12($sp)
-	sw $s2, 8($sp)
-	sw $s3, 4($sp) 
-	sw $s4, 0($sp)
+	sw $s0, 16($sp)	#first integer
+	sw $s1, 12($sp)	#second integer
+	sw $s2, 8($sp)	#arithmetic oper
+	sw $s3, 4($sp) 	#result
+	sw $s4, 0($sp)	#resevered for remainder
 Loop:
 	
 	#Prompt user for first input int
