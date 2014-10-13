@@ -16,8 +16,28 @@ terminate: .asciiz "Calculator Terminated"
 	.text
 
 #function for multiplication
+#a0 X a1 = 
+
+Multiply: 
+	# a counter to keep track of how many times we've iterated
+	# through the loop
+	add $s0, $zero, $zero
+	# a variable to store the result of the operation
+	add $s1, $zero, $zero	
+	ja Loop
+Return:
+	# store result on stack
+	# adjust stack pointer accordingly
+
+Loop:
+	add $s0, $s0, $a0
+	addi $s0, 1
+	beq $s0, $s1, Return
+	ja Loop
 
 #function for division
+
+
 
 #the following will be the main program
 main:
