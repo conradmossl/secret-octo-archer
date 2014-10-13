@@ -13,8 +13,8 @@ oper: .space 4
 heading: .asciiz "Welcome to SPIM Calculator 1.0!\n\n"
 first: .asciiz "Enter the first number "
 second: .asciiz "Enter the second number "
-operation: .asciiz "\nEnter the operation (+,-,*,/), the press enter key: ="
-calculation: .asciiz "\nAnother Calculation [y, n]?\n \n"
+operation: .asciiz "Enter the operation (+,-,*,/), then press enter key: = "
+calculation: .asciiz "\n \nAnother Calculation [y, n]?\n \n"
 terminate: .asciiz "\nCalculator Terminated"
 
 	#the following will be be actual code
@@ -57,45 +57,34 @@ Subtract:
 Multiply: 
 	# a counter to keep track of how many iterations we've made
 	# through the loop
-	add $t0, $zero, $zero
+	add $s4, $zero, $zero
 	add	$s3, $zero, $zero
+	jal Loop_mult
 Loop_mult:
-	beq $t0, $s1, Answer
-	add $s3, $s0, $zero
-	addi $t0, $t0, 1
-	ja Loop_mult
+	beq $s4, $s1, Answer
+	add $s3, $s3, $s0
+	addi $s4, $s4, 1
+	jal Loop_mult
 
 #subroutine for division
 #s3 = s0 / s1 
 #s4 = s0 % s1
 
-# Divide:
-# 	div $s0, $s1
-# 	sw $LO, $s3
-# 	sw $HI, $s4 	
-# 	#print the Remainder
-# 	li $v0, 4
-# 	la $a0, "\nRemainder ==> "
-# 	syscall
-# 	li $v0, 1
-# 	la $a0, $s3
-# 	syscall
-
 Divide:
 	
 	
 	#print the Remainder
-	li $v0, 4
-	la $a0, "\nRemainder ==> "
-	syscall
+	# li $v0, 4
+	# la $a0, "\nRemainder ==> "
+	# syscall
 	li $v0, 1
-	la $a0, $s3
+	add $a0, $s3, $zero
 	syscall
 	
 	# li $v0, 4
 	# la $a0, "\nQuotient ==> "
 	# syscall
-	# ja Answer
+	jal Answer
 	
 #the following will be the main program
 main:
@@ -154,8 +143,8 @@ Loop:
 
 	beq $s2, '+', Add
 	beq $s2, '-', Subtract
-	# beq $s2, '*', Multiply
-	# beq $s2, '/', Divide
+	beq $s2, '*', Multiply
+	beq $s2, '/', Divide
 	jal End
 End:
 	#restore the registers
