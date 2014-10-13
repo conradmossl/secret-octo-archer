@@ -1,6 +1,7 @@
 .text
 main:
-	lui $t0, 15 
-	or  $t0, 15
-	lui $t0, 15
-	jr $ra
+	lui $t0, 15    # 000f0000
+	or  $t0, 15	   # 000f000f
+	lui $t0, 15    # 000f0000
+	jr $ra         # 00400018
+	
