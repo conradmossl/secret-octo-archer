@@ -14,6 +14,7 @@ heading: .asciiz "Welcome to SPIM Calculator 1.0!\n"
 first: .asciiz "\nEnter the first number "
 second: .asciiz "Enter the second number "
 operation: .asciiz "Enter the operation (+,-,*,/), then press enter key: = "
+equal: .asciiz "="
 remain: .asciiz "\nRemainder ==> " 
 quoti: .asciiz "\nQuotient ==> "
 calculation: .asciiz "\n \nAnother Calculation [y, n]?\n \n"
@@ -23,9 +24,27 @@ terminate: .asciiz "\nCalculator Terminated"
 	.text
 
 Answer:
-	
+	#print the first integer
+	li $v0, 1
+	add $a0, $s0, $zero
+	syscall
 
-	#Print the answer
+	#print the character
+	li $v0, 11
+	lw $a0, oper
+	syscall
+
+	#print the second integer
+	li $v0, 1
+	add $a0, $s1, $zero
+	syscall
+
+	#print an equal sign
+	li $v0, 4
+	la $a0, equal
+	syscall
+
+	#print the answer
 	li $v0, 1
 	add $a0, $s3, $zero
 	syscall
@@ -94,6 +113,8 @@ Print_div:
 	jal Answer
 
 Loop_div:
+	#subtracts the divisor from the dividend until the former is greater
+	#than the latter
 	slt $t0, $s0, $s1
 	bne $t0, $zero, Print_div
 	sub $s0, $s0, $s1
@@ -160,6 +181,7 @@ Loop:
 	beq $s2, '*', Multiply
 	beq $s2, '/', Divide
 	jal End
+	
 End:
 	#restore the registers
 	addi $sp, $sp, 20
