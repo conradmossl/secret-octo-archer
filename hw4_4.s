@@ -15,15 +15,22 @@ first: .asciiz "\nEnter the first number "
 second: .asciiz "Enter the second number "
 operation: .asciiz "Enter the operation (+,-,*,/), then press enter key: = "
 equal: .asciiz "="
-remain: .asciiz "\nRemainder ==> " 
-quoti: .asciiz "\nQuotient ==> "
-calculation: .asciiz "\n \nAnother Calculation [y, n]?\n \n"
+front: .asciiz "["
+back: .asciiz "]"
+enter: .asciiz " \n"
+calculation: .asciiz "\n \nAnother Calculation [y, n]?"
 terminate: .asciiz "\nCalculator Terminated"
 
 	#the following will be be actual code
 	.text
 
 Answer:
+
+	#print a breakline
+	li $v0, 4
+	la $a0, enter
+	syscall
+
 	#print the first integer
 	li $v0, 1
 	add $a0, $s0, $zero
@@ -49,6 +56,11 @@ Answer:
 	add $a0, $s3, $zero
 	syscall
 
+	beq $s2, '/', Print_div
+	
+	jal Continue
+
+Continue:
 	#set the syscall to print out a string
 	li $v0, 4
 	#set a point in the memory for the string
@@ -60,6 +72,11 @@ Answer:
 	syscall
 
 	beq $v0, 'n', End
+
+	#print a breakline
+	li $v0, 4
+	la $a0, enter
+	syscall
 
 	jal Loop
 
@@ -99,24 +116,28 @@ Divide:
 	jal Loop_div
 Print_div:
 
-	#print the Remainder
+	#print "["
 	li $v0, 4
-	la $a0, remain
+	la $a0, front
 	syscall
+
+	#print the remainder
 	li $v0, 1
 	add $a0, $s0, $zero
 	syscall
 	
+	#print "]"
 	li $v0, 4
-	la $a0, quoti
+	la $a0, back
 	syscall
-	jal Answer
+
+	jal Continue
 
 Loop_div:
 	#subtracts the divisor from the dividend until the former is greater
 	#than the latter
 	slt $t0, $s0, $s1
-	bne $t0, $zero, Print_div
+	bne $t0, $zero, Answer
 	sub $s0, $s0, $s1
 	addi $s3, $s3, 1
 	jal Loop_div
@@ -193,4 +214,6 @@ End:
 
 	li $v0, 4
 	la $a0, terminate
+
+	li $v0, 10
 	syscall
